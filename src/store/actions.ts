@@ -15,12 +15,14 @@ interface IUpdateQuery {
 export const updateInput = (
   input: string
 ): ThunkAction<void, IState, {}, Action> => dispatch => {
+  const theInput = input.toUpperCase()
+
   dispatch({
     type: constants.UPDATE_INPUT,
-    input
+    input: theInput
   });
 
-  const parseOutput = parse(input);
+  const parseOutput = parse(theInput);
 
   if (parseOutput instanceof Array) {
     dispatch(setEntities(parseOutput));

@@ -4,8 +4,8 @@ import { IStockPrice, IPrice } from "../interfaces/StockPrice";
 const baseUrl = "https://www.quandl.com/api/v3/datasets/WIKI/";
 
 export class TickerSymbolNotFound extends Error {
-  constructor() {
-    super("Ticker symbol not found");
+  constructor(tickerSymbol: string) {
+    super(`Ticker symbol ${tickerSymbol} not found`);
   }
 }
 
@@ -41,7 +41,7 @@ export const fetchStockPrice = async (
     if (data.quandl_error && data.quandl_error.code === INCORRECT_CODE) {
       return {
         tickerSymbol: tickerSymbol,
-        error: new TickerSymbolNotFound()
+        error: new TickerSymbolNotFound(tickerSymbol)
       };
     } else {
       return {
@@ -55,6 +55,11 @@ export const fetchStockPrice = async (
       return {
         tickerSymbol: tickerSymbol,
         error: new CanNotGetResponse()
+      };
+    } else if (error.response && error.response.status === 404) {
+      return {
+        tickerSymbol: tickerSymbol,
+        error: new TickerSymbolNotFound(tickerSymbol)
       };
     } else {
       return {

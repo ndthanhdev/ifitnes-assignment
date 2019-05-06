@@ -10,9 +10,12 @@ const useStyles = makeStyles({
   root: {
     display: "flex"
   },
-  input: {
+  inputBase: {
     flex: 1,
-    marginLeft: "0.5rem"
+    marginLeft: "0.5rem",
+  },
+  input:{
+    "text-transform": "uppercase"
   },
   iconButton: {
     padding: "0.5rem"
@@ -28,8 +31,9 @@ export const QueryBar: React.FC = () => {
     <Paper className={classes.root}>
       <InputBase
         placeholder="<ticket symbol> <value>"
-        className={classes.input}
+        className={classes.inputBase}
         onChange={e=>debounceDispatch(updateInput(e.target.value))}
+        inputProps={{className: classes.input}}
       />
       <IconButton className={classes.iconButton} aria-label="Search" >
         <SearchIcon />

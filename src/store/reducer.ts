@@ -43,7 +43,6 @@ function setStockPrices(
 ) {
   const theMap = { ...stockPriceMap };
   theMap[stockPrice.tickerSymbol] = {
-    ...theMap[stockPrice.tickerSymbol],
     ...stockPrice
   };
 

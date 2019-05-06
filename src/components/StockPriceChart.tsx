@@ -98,6 +98,16 @@ function createPrices(tickers: IVisualTicker[]) {
   }));
 }
 
+function getErrorMessage(tickers: IVisualTicker[]) {
+  const errorTicker = tickers.find(vTicker => Boolean(vTicker.error))
+
+  if( errorTicker && errorTicker.error){
+    return errorTicker.error.message
+  }
+
+  return undefined
+}
+
 const useStockPrices = () => {
   return useSelector((state: IState) => state.stockPriceMap);
 };
@@ -122,6 +132,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
   function handleTabChange(event: any, newValue: any) {
     setRange(newValue);
   }
+
   const stockPrices = useStockPrices();
 
   let tickerEntities: ITickerEntity[] = [];
@@ -147,7 +158,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
 
   let isLoading = visualTickers.some(vTicker => vTicker.isLoading);
 
-  let errorMessage = visualTickers.find(vTicker => Boolean(vTicker.error));
+  let errorMessage = getErrorMessage(visualTickers);
 
   let prices = !isLoading && !errorMessage ? createPrices(visualTickers) : [];
 
@@ -172,7 +183,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
                 <defs>
                   {visualTickers.map(vTicker => (
                     <linearGradient
-                      key={vTicker.tickerSymbol}
+                      key={vTicker.tickerSymbol + 'gradient'}
                       id={vTicker.tickerSymbol}
                       x1="0"
                       y1="0"
@@ -194,7 +205,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
                 </defs>
                 {visualTickers.map(vTicker => (
                   <Area
-                    key={vTicker.tickerSymbol}
+                    key={vTicker.tickerSymbol + 'area'}
                     type="monotone"
                     dataKey={vTicker.tickerSymbol}
                     stroke={vTicker.color}
@@ -206,7 +217,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
                   return (
                     vTicker.base !== undefined && (
                       <ReferenceLine
-                        key={vTicker.tickerSymbol}
+                        key={vTicker.tickerSymbol + 'refLine'}
                         y={vTicker.base}
                         stroke={vTicker.color}
                         label={`${vTicker.base}`}
