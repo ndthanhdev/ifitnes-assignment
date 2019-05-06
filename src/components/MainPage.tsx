@@ -12,13 +12,13 @@ const useStyles = makeStyles({
   }
 });
 
-const useQueries = () => {
-  return useSelector((state: IState) => state.queries);
+const useEntities = () => {
+  return useSelector((state: IState) => state.entities);
 };
 
 export const MainPage: React.FC = () => {
   const classes = useStyles();
-  const queries = useQueries();
+  const entities = useEntities();
 
   return (
     <Grid container direction="column" className={classes.root} spacing={1}>
@@ -31,10 +31,10 @@ export const MainPage: React.FC = () => {
       </Grid>
       <Grid item>
         <Grid container justify="center" spacing={2}>
-          {queries.map(query => {
+          {entities.map((entity, index) => {
             return (
-              <Grid item xs={12} sm={10} key={query.tickerSymbol}>
-                <StockPriceChart query={query} />
+              <Grid item xs={12} sm={10} key={index}>
+                <StockPriceChart entity={entity} />
               </Grid>
             );
           })}

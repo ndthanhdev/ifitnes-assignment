@@ -1,3 +1,3 @@
 import { ITickerEntity } from "./Entity";
 
-export type IQuery = Pick<ITickerEntity, "tickerSymbol" | "operator" | "base">;
+export type IQuery = Pick<ITickerEntity, "tickerSymbol">;

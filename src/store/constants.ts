@@ -1,6 +1,9 @@
 export const UPDATE_INPUT = "UPDATE_INPUT";
 export type UPDATE_INPUT = typeof UPDATE_INPUT;
 
+export const SET_ENTITIES = "SET_ENTITIES";
+export type SET_ENTITIES = typeof SET_ENTITIES;
+
 export const UPDATE_QUERIES = "UPDATE_QUERIES";
 export type UPDATE_QUERIES = typeof UPDATE_QUERIES;
 

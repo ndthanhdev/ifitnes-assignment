@@ -2,8 +2,11 @@ import * as constants from "./constants";
 import { IQuery } from "../interfaces/Query";
 import * as quandl from "../services/quandl";
 import { ThunkAction } from "redux-thunk";
-import { IState } from "./reducer";
+import { IState, IStockPriceMap } from "./reducer";
 import { IStockPrice } from "../interfaces/StockPrice";
+import { parse } from "../utils/parser";
+import { IEntity } from "../interfaces/Entity";
+import { entitiesToQueries, entitiesToStockPrices } from "../utils/actions";
 
 interface IUpdateQuery {
   type: constants.UPDATE_INPUT;
@@ -16,53 +19,68 @@ export const updateInput = (
     type: constants.UPDATE_INPUT,
     input
   });
-  const queries = input
-    .trim()
-    .split(" ")
-    .map(
-      tickerSymbol =>
-        ({
-          tickerSymbol
-        } as IQuery)
-    );
-  dispatch(updateQueries(queries));
+
+  const parseOutput = parse(input);
+
+  if (parseOutput instanceof Array) {
+    dispatch(setEntities(parseOutput));
+  } else {
+    // TODO: handle parse error
+  }
 };
 
-interface IUpdateQueries {
-  type: constants.UPDATE_QUERIES;
-  queries: IQuery[];
+interface ISetEntities {
+  type: constants.SET_ENTITIES;
+  entities: IEntity[];
 }
-export const updateQueries = (
-  queries: IQuery[]
+export const setEntities = (
+  entities: IEntity[]
 ): ThunkAction<void, IState, {}, Action> => dispatch => {
   dispatch({
-    type: constants.UPDATE_QUERIES,
-    queries: queries
-  } as IUpdateQueries);
+    type: constants.SET_ENTITIES,
+    entities
+  } as ISetEntities);
 
-  const tickerSymbols = queries.map(query => query.tickerSymbol);
-  dispatch(updateStockPrices(tickerSymbols));
+  dispatch(updateStockPrices(entitiesToStockPrices(entities)));
 };
+
+// interface IUpdateQueries {
+//   type: constants.UPDATE_QUERIES;
+//   queries: Set<string>;
+// }
+// export const updateQueries = (
+//   queries: Set<string>
+// ): ThunkAction<void, IState, {}, Action> => dispatch => {
+//   dispatch({
+//     type: constants.UPDATE_QUERIES,
+//     queries: queries
+//   } as IUpdateQueries);
+
+//   dispatch(updateStockPrices(Array.from(queries)));
+
+// };
 
 export interface IUpdateStockPrices {
   type: constants.UPDATE_STOCK_PRICES;
-  tickerSymbols: string[];
+  stockPrices:IStockPriceMap;
 }
 export const updateStockPrices = (
-  tickerSymbols: string[]
+  stockPrices: IStockPriceMap
 ): ThunkAction<Promise<void>, IState, {}, Action> => async (
   dispatch,
   getState
 ) => {
   dispatch({
     type: constants.UPDATE_STOCK_PRICES,
-    tickerSymbols
+    stockPrices
   } as IUpdateStockPrices);
 
   const state = getState();
+  const tickerSymbols = Object.keys(stockPrices);
+
   tickerSymbols
     .filter(symbol => {
-      const stockPrice = state.stockPrices.get(symbol);
+      const stockPrice = state.stockPriceMap[symbol];
       return !stockPrice || !stockPrice.name;
     })
     .map(tickerSymbol => dispatch(fetchStockPrice(tickerSymbol)));
@@ -80,7 +98,7 @@ export const fetchStockPrice = (
 ) => {
   dispatch({
     type: constants.FETCH_STOCK_PRICE,
-    tickerSymbol,
+    tickerSymbol
   } as IFetchStockPrice);
 
   const fetchResult = await quandl.fetchStockPrice(tickerSymbol);
@@ -88,7 +106,7 @@ export const fetchStockPrice = (
   const state = getState();
 
   // set or skip
-  if (state.stockPrices.get(tickerSymbol)) {
+  if (state.stockPriceMap[tickerSymbol]) {
     dispatch(setStockPrice(fetchResult));
   }
 };
@@ -126,8 +144,8 @@ export interface IExecuteQuery {
 
 export type Action =
   | IUpdateQuery
-  | IUpdateQueries
   | IExecuteQuery
   | IUpdateStockPrices
   | IFetchStockPrice
-  | ISetStockPrice;
+  | ISetStockPrice
+  | ISetEntities;

@@ -4,30 +4,33 @@ import { IQuery } from "../interfaces/Query";
 import { IStockPrice } from "../interfaces/StockPrice";
 import { IEntity } from "../interfaces/Entity";
 
+export interface IStockPriceMap {
+  [tickerSymbol: string]: IStockPrice;
+}
+
 export interface IState {
   input: string;
   entities: IEntity[];
-  queries: IQuery[];
-  stockPrices: Map<string, IStockPrice>;
+  stockPriceMap: IStockPriceMap;
 }
 
 export const initialState: IState = {
   input: "",
   entities: [],
-  queries: [],
-  stockPrices: new Map<string, IStockPrice>()
+  stockPriceMap: {}
 };
 
 function updateStockPrices(
-  stockPrices: Map<string, IStockPrice>,
-  tickerSymbols: string[]
+  newStockPriceMap: IStockPriceMap,
+  currentStockPriceMap: IStockPriceMap
 ) {
-  const theMap = new Map<string, IStockPrice>();
+  const theMap = { ...newStockPriceMap };
+  const tickerSymbols = Array.from(Object.keys(theMap));
 
   for (const tickerSymbol of tickerSymbols) {
-    theMap.set(
-      tickerSymbol,
-      Object.assign({ tickerSymbol }, stockPrices.get(tickerSymbol))
+    theMap[tickerSymbol] = Object.assign(
+      { ...theMap[tickerSymbol] },
+      currentStockPriceMap[tickerSymbol]
     );
   }
 
@@ -35,14 +38,14 @@ function updateStockPrices(
 }
 
 function setStockPrices(
-  stockPrices: Map<string, IStockPrice>,
-  stockPrice: IStockPrice
+  stockPrice: IStockPrice,
+  stockPriceMap: IStockPriceMap
 ) {
-  const theMap = new Map<string, IStockPrice>(stockPrices);
-  theMap.set(stockPrice.tickerSymbol, {
-    ...theMap.get(stockPrice.tickerSymbol),
+  const theMap = { ...stockPriceMap };
+  theMap[stockPrice.tickerSymbol] = {
+    ...theMap[stockPrice.tickerSymbol],
     ...stockPrice
-  });
+  };
 
   return theMap;
 }
@@ -57,22 +60,25 @@ export const reducer = (
         ...state,
         input: action.input
       };
-    case constants.UPDATE_QUERIES:
+    case constants.SET_ENTITIES:
       return {
         ...state,
-        queries: action.queries
+        entities: [...action.entities]
       };
     case constants.UPDATE_STOCK_PRICES:
       return {
         ...state,
-        stockPrices: updateStockPrices(state.stockPrices, action.tickerSymbols)
+        stockPriceMap: updateStockPrices(
+          action.stockPrices,
+          state.stockPriceMap
+        )
       };
     case constants.SET_STOCK_PRICE:
       return {
         ...state,
-        stockPrices: setStockPrices(state.stockPrices, action.stockPrice)
+        stockPriceMap: setStockPrices(action.stockPrice, state.stockPriceMap)
       };
     default:
-      return state;
+      return { ...state };
   }
 };

@@ -5,7 +5,8 @@ import {
   ResponsiveContainer,
   Tooltip,
   AreaChart,
-  Area
+  Area,
+  ReferenceLine
 } from "recharts";
 import {
   Typography,
@@ -16,11 +17,14 @@ import {
   Grid,
   CircularProgress
 } from "@material-ui/core";
-import { IPrice } from "../interfaces/StockPrice";
-import { IState } from "../store/reducer";
 import { useSelector } from "react-redux";
-import { IQuery } from "../interfaces/Query";
-import moment from "moment";
+import _ from "lodash";
+import randomcolor from "randomcolor";
+import { IPrice, IStockPrice } from "../interfaces/StockPrice";
+import { IState, IStockPriceMap } from "../store/reducer";
+import moment, { Moment } from "moment";
+import { IEntity, ITickerEntity } from "../interfaces/Entity";
+import { IVisualTicker } from "../interfaces/VisualTicker";
 
 function getNotBefore(rangeIndex: number) {
   let result = moment("20180327");
@@ -51,8 +55,51 @@ function getNotBefore(rangeIndex: number) {
   return result;
 }
 
-const useStockPrice = (tickerSymbol: string) => {
-  return useSelector((state: IState) => state.stockPrices.get(tickerSymbol));
+function createVisualTicker(
+  tickerEntities: ITickerEntity[],
+  stockPrices: IStockPriceMap,
+  notBefore: Moment
+) {
+  return tickerEntities.map((tickerEntity, index) => {
+
+    let result = {
+      tickerSymbol: tickerEntity.tickerSymbol,
+      operator: tickerEntity.operator,
+      base: tickerEntity.base,
+      isLoading: true,
+      prices: [],
+      color: randomcolor({ seed: tickerEntity.tickerSymbol})
+    } as IVisualTicker;
+
+    const stockPrice = stockPrices[tickerEntity.tickerSymbol];
+
+    if (stockPrice) {
+      result.error = stockPrice.error;
+      if (stockPrice.error || stockPrice.name) result.isLoading = false;
+      if (stockPrice.prices)
+        result.prices = stockPrice.prices
+          .filter(price => notBefore.isBefore(price.date))
+          .map(({ date, close }) => ({
+            date,
+            [tickerEntity.tickerSymbol]: close
+          }));
+    }
+
+    return result;
+  });
+}
+
+function createPrices(tickers: IVisualTicker[]) {
+  let merged = _.mergeWith([], ...tickers.map(vTicker => vTicker.prices));
+
+  return Object.keys(merged).map(k => ({
+    date: k,
+    ...merged[k]
+  }));
+}
+
+const useStockPrices = () => {
+  return useSelector((state: IState) => state.stockPriceMap);
 };
 
 const useStyles = makeStyles({
@@ -68,43 +115,48 @@ const useStyles = makeStyles({
 });
 
 interface IProps {
-  query: IQuery;
+  entity: IEntity;
 }
 
-export const StockPriceChart: React.FC<IProps> = ({ query }) => {
+export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
   function handleTabChange(event: any, newValue: any) {
     setRange(newValue);
   }
+  const stockPrices = useStockPrices();
+
+  let tickerEntities: ITickerEntity[] = [];
+
+  if (entity.type === "TickerEntity") {
+    tickerEntities.push(entity);
+  } else if (entity.type === "Combination") {
+    tickerEntities.push(...entity.queries);
+  }
+
+  const title = tickerEntities.map(entity => entity.tickerSymbol).join(" | ");
+
+  const [range, setRange] = React.useState(0);
+  let notBefore = getNotBefore(range);
+
+  const visualTickers = createVisualTicker(
+    tickerEntities,
+    stockPrices,
+    notBefore
+  );
 
   const classes = useStyles();
 
-  const [range, setRange] = React.useState(0);
+  let isLoading = visualTickers.some(vTicker => vTicker.isLoading);
 
-  const stockPrice = useStockPrice(query.tickerSymbol);
+  let errorMessage = visualTickers.find(vTicker => Boolean(vTicker.error));
 
-  let notBefore = getNotBefore(range);
-
-  let prices: IPrice[] = [];
-  if (stockPrice && stockPrice.prices) {
-    prices = stockPrice.prices.filter(price => notBefore.isBefore(price.date));
-  }
-
-  let isLoading = true;
-  if (stockPrice && (stockPrice.error || stockPrice.name)) {
-    isLoading = false;
-  }
-
-  let errorMessage = "";
-  if (stockPrice && stockPrice.error) {
-    errorMessage = stockPrice.error.message;
-  }
+  let prices = !isLoading && !errorMessage ? createPrices(visualTickers) : [];
 
   return (
     <Paper>
       <Grid container direction="column" spacing={1} className={classes.grid}>
         <Grid item>
           <Typography variant="h6" color="primary" align="center">
-            {query.tickerSymbol}
+            {title}
           </Typography>
         </Grid>
         <Grid
@@ -118,18 +170,51 @@ export const StockPriceChart: React.FC<IProps> = ({ query }) => {
             <ResponsiveContainer>
               <AreaChart data={prices}>
                 <defs>
-                  <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8} />
-                    <stop offset="95%" stopColor="#8884d8" stopOpacity={0} />
-                  </linearGradient>
+                  {visualTickers.map(vTicker => (
+                    <linearGradient
+                      key={vTicker.tickerSymbol}
+                      id={vTicker.tickerSymbol}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor={vTicker.color}
+                        stopOpacity={0.5}
+                      />
+                      <stop
+                        offset="80%"
+                        stopColor={vTicker.color}
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  ))}
                 </defs>
-                <Area
-                  type="monotone"
-                  dataKey="close"
-                  stroke="#8884d8"
-                  fillOpacity={1}
-                  fill="url(#colorUv)"
-                />
+                {visualTickers.map(vTicker => (
+                  <Area
+                    key={vTicker.tickerSymbol}
+                    type="monotone"
+                    dataKey={vTicker.tickerSymbol}
+                    stroke={vTicker.color}
+                    fillOpacity={1}
+                    fill={`url(#${vTicker.tickerSymbol})`}
+                  />
+                ))}
+                {visualTickers.map(vTicker => {
+                  return (
+                    vTicker.base !== undefined && (
+                      <ReferenceLine
+                        key={vTicker.tickerSymbol}
+                        y={vTicker.base}
+                        stroke={vTicker.color}
+                        label={`${vTicker.base}`}
+                        strokeDasharray="3 3"
+                      />
+                    )
+                  );
+                })}
                 <XAxis dataKey="date" reversed />
                 <YAxis />
                 <Tooltip />
