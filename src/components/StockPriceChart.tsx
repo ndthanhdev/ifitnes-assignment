@@ -20,7 +20,6 @@ import {
 import { useSelector } from "react-redux";
 import _ from "lodash";
 import randomcolor from "randomcolor";
-import { IPrice, IStockPrice } from "../interfaces/StockPrice";
 import { IState, IStockPriceMap } from "../store/reducer";
 import moment, { Moment } from "moment";
 import { IEntity, ITickerEntity } from "../interfaces/Entity";
@@ -61,14 +60,13 @@ function createVisualTicker(
   notBefore: Moment
 ) {
   return tickerEntities.map((tickerEntity, index) => {
-
     let result = {
       tickerSymbol: tickerEntity.tickerSymbol,
       operator: tickerEntity.operator,
       base: tickerEntity.base,
       isLoading: true,
       prices: [],
-      color: randomcolor({ seed: tickerEntity.tickerSymbol})
+      color: randomcolor({ seed: tickerEntity.tickerSymbol })
     } as IVisualTicker;
 
     const stockPrice = stockPrices[tickerEntity.tickerSymbol];
@@ -99,28 +97,40 @@ function createPrices(tickers: IVisualTicker[]) {
 }
 
 function getErrorMessage(tickers: IVisualTicker[]) {
-  const errorTicker = tickers.find(vTicker => Boolean(vTicker.error))
+  const errorTicker = tickers.find(vTicker => Boolean(vTicker.error));
 
-  if( errorTicker && errorTicker.error){
-    return errorTicker.error.message
+  if (errorTicker && errorTicker.error) {
+    return errorTicker.error.message;
   }
 
-  return undefined
+  return undefined;
 }
 
-const useStockPrices = () => {
+export const useStockPrices = () => {
   return useSelector((state: IState) => state.stockPriceMap);
 };
 
 const useStyles = makeStyles({
-  tabRange: {
-    height: "2rem"
+  flexContainer:{
+    display: 'flex',
+    flexGrow: 1
   },
-  grid: {
-    height: "20rem"
+  container: {
+    // height: "24rem",
+    flexGrow: 1
   },
   chartContainer: {
     "flex-grow": 1
+  },
+  tabWrapperParent: {
+    position: "relative",
+    overflow: "hidden",
+    height: "3rem"
+  },
+  tabWrapper: {
+    position: "absolute",
+    left: 0,
+    right: 0
   }
 });
 
@@ -163,12 +173,32 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
   let prices = !isLoading && !errorMessage ? createPrices(visualTickers) : [];
 
   return (
-    <Paper>
-      <Grid container direction="column" spacing={1} className={classes.grid}>
+    <Paper className={classes.flexContainer}>
+      <Grid container direction="column" spacing={1} className={classes.container}>
         <Grid item>
           <Typography variant="h6" color="primary" align="center">
             {title}
           </Typography>
+        </Grid>
+        <Grid item>
+          <div className={classes.tabWrapperParent}>
+            <div className={classes.tabWrapper}>
+              <Tabs
+                value={range}
+                onChange={handleTabChange}
+                scrollButtons="auto"
+                variant="scrollable"
+              >
+                <Tab label="1 week" />
+                <Tab label="1 month" />
+                <Tab label="3 months" />
+                <Tab label="6 months" />
+                <Tab label="1 year" />
+                <Tab label="5 years" />
+                <Tab label="All" />
+              </Tabs>
+            </div>
+          </div>
         </Grid>
         <Grid
           item
@@ -183,7 +213,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
                 <defs>
                   {visualTickers.map(vTicker => (
                     <linearGradient
-                      key={vTicker.tickerSymbol + 'gradient'}
+                      key={vTicker.tickerSymbol + "gradient"}
                       id={vTicker.tickerSymbol}
                       x1="0"
                       y1="0"
@@ -205,7 +235,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
                 </defs>
                 {visualTickers.map(vTicker => (
                   <Area
-                    key={vTicker.tickerSymbol + 'area'}
+                    key={vTicker.tickerSymbol + "area"}
                     type="monotone"
                     dataKey={vTicker.tickerSymbol}
                     stroke={vTicker.color}
@@ -217,7 +247,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
                   return (
                     vTicker.base !== undefined && (
                       <ReferenceLine
-                        key={vTicker.tickerSymbol + 'refLine'}
+                        key={vTicker.tickerSymbol + "refLine"}
                         y={vTicker.base}
                         stroke={vTicker.color}
                         label={`${vTicker.base}`}
@@ -238,22 +268,6 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
               {errorMessage}
             </Typography>
           )}
-        </Grid>
-        <Grid item>
-          <Tabs
-            value={range}
-            onChange={handleTabChange}
-            scrollButtons="auto"
-            variant="scrollable"
-          >
-            <Tab label="1 week" />
-            <Tab label="1 month" />
-            <Tab label="3 months" />
-            <Tab label="6 months" />
-            <Tab label="1 year" />
-            <Tab label="5 years" />
-            <Tab label="All" />
-          </Tabs>
         </Grid>
       </Grid>
     </Paper>
