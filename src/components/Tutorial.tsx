@@ -40,12 +40,12 @@ export const Tutorial: React.FC = () => {
       image: "images/tut-2.png"
     },
     {
-      label: "Add baseline",
+      label: "Reference line and Operators",
       content: "FB 160 MSFT < 70 TSLA > 310",
       image: "images/tut-3.png"
     },
     {
-      label: "Combine together",
+      label: "Everything works together",
       content: "FB 160 + MSFT < 70 + TSLA",
       image: "images/tut-4.png"
     }
@@ -76,14 +76,6 @@ export const Tutorial: React.FC = () => {
                 </StepButton>
                 {!isMediumScreen && (
                   <StepContent>
-                    {/* <Typography variant="h5" color="textSecondary">
-                      {steps[index].content}
-                    </Typography>
-                    <br />
-                    <img
-                      src={steps[activeStep].image}
-                      className={classes.image}
-                    /> */}
                     <Grid
                       item
                       container
@@ -99,6 +91,7 @@ export const Tutorial: React.FC = () => {
                       </Grid>
                       <Grid item>
                         <img
+                          alt={`${steps[activeStep].content}`}
                           src={steps[activeStep].image}
                           className={classes.image}
                         />
@@ -125,7 +118,11 @@ export const Tutorial: React.FC = () => {
               <br />
             </Grid>
             <Grid item>
-              <img src={steps[activeStep].image} className={classes.image} />
+              <img
+                alt={`${steps[activeStep].content}`}
+                src={steps[activeStep].image}
+                className={classes.image}
+              />
             </Grid>
           </Grid>
         )}

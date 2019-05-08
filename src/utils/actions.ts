@@ -2,10 +2,10 @@ import { IEntity } from "../interfaces/Entity";
 import { IStockPrice } from "../interfaces/StockPrice";
 import { IStockPriceMap } from "../store/reducer";
 
-export function entitiesToQueries(entities: IEntity[]) {
-  return entities.reduce((acc, entity) => {
+export const entitiesToQueries = (entities: IEntity[]) =>
+  entities.reduce((acc, entity) => {
     if (entity.type === "Combination") {
-      entity.queries.map(ticker => {
+      entity.queries.forEach(ticker => {
         acc.add(ticker.tickerSymbol);
       });
     } else if (entity.type === "TickerEntity") {
@@ -13,7 +13,6 @@ export function entitiesToQueries(entities: IEntity[]) {
     }
     return acc;
   }, new Set<string>());
-}
 
 function createStockPrice(tickerSymbol: string) {
   return {
@@ -21,11 +20,11 @@ function createStockPrice(tickerSymbol: string) {
   } as IStockPrice;
 }
 
-export function entitiesToStockPrices(entities: IEntity[]) {
+export const entitiesToStockPrices = (entities: IEntity[]) => {
   return entities.reduce(
     (acc, entity) => {
       if (entity.type === "Combination") {
-        entity.queries.map(ticker => {
+        entity.queries.forEach(ticker => {
           acc[ticker.tickerSymbol] = createStockPrice(ticker.tickerSymbol);
         });
       } else if (entity.type === "TickerEntity") {
@@ -35,6 +34,6 @@ export function entitiesToStockPrices(entities: IEntity[]) {
     },
     {} as IStockPriceMap
   );
-}
+};
 
 export function tickerSymbolToStockPrice(tickerSymbol: string) {}

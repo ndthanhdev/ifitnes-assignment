@@ -4,6 +4,9 @@ export type UPDATE_INPUT = typeof UPDATE_INPUT;
 export const SET_ENTITIES = "SET_ENTITIES";
 export type SET_ENTITIES = typeof SET_ENTITIES;
 
+export const SET_PARSER_MESSAGE = "SET_PARSER_MESSAGE";
+export type SET_PARSER_MESSAGE = typeof SET_PARSER_MESSAGE;
+
 export const UPDATE_QUERIES = "UPDATE_QUERIES";
 export type UPDATE_QUERIES = typeof UPDATE_QUERIES;
 

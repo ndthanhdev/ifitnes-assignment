@@ -9,6 +9,7 @@ export interface IStockPriceMap {
 
 export interface IState {
   input: string;
+  parserMessage?: string;
   entities: IEntity[];
   stockPriceMap: IStockPriceMap;
 }
@@ -58,10 +59,17 @@ export const reducer = (
         ...state,
         input: action.input
       };
+    case constants.SET_PARSER_MESSAGE:
+      return {
+        ...state,
+        entities: [],
+        parserMessage: action.message
+      };
     case constants.SET_ENTITIES:
       return {
         ...state,
-        entities: [...action.entities]
+        entities: [...action.entities],
+        parserMessage: undefined
       };
     case constants.UPDATE_STOCK_PRICES:
       return {

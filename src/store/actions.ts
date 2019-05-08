@@ -6,16 +6,16 @@ import { IState, IStockPriceMap } from "./reducer";
 import { IStockPrice } from "../interfaces/StockPrice";
 import { parse } from "../utils/parser";
 import { IEntity } from "../interfaces/Entity";
-import { entitiesToQueries, entitiesToStockPrices } from "../utils/actions";
+import { entitiesToStockPrices } from "../utils/actions";
 
-interface IUpdateQuery {
+interface IUpdateInput {
   type: constants.UPDATE_INPUT;
   input: string;
 }
 export const updateInput = (
   input: string
 ): ThunkAction<void, IState, {}, Action> => dispatch => {
-  const theInput = input.toUpperCase()
+  const theInput = input.toUpperCase();
 
   dispatch({
     type: constants.UPDATE_INPUT,
@@ -27,9 +27,16 @@ export const updateInput = (
   if (parseOutput instanceof Array) {
     dispatch(setEntities(parseOutput));
   } else {
-    // TODO: handle parse error
+    dispatch(setParserMessage(String(parseOutput)));
   }
 };
+
+interface ISetParserMessage {
+  type: constants.SET_PARSER_MESSAGE;
+  message: string;
+}
+export const setParserMessage = (message: string) =>
+  ({ type: constants.SET_PARSER_MESSAGE, message } as ISetParserMessage);
 
 interface ISetEntities {
   type: constants.SET_ENTITIES;
@@ -46,25 +53,9 @@ export const setEntities = (
   dispatch(updateStockPrices(entitiesToStockPrices(entities)));
 };
 
-// interface IUpdateQueries {
-//   type: constants.UPDATE_QUERIES;
-//   queries: Set<string>;
-// }
-// export const updateQueries = (
-//   queries: Set<string>
-// ): ThunkAction<void, IState, {}, Action> => dispatch => {
-//   dispatch({
-//     type: constants.UPDATE_QUERIES,
-//     queries: queries
-//   } as IUpdateQueries);
-
-//   dispatch(updateStockPrices(Array.from(queries)));
-
-// };
-
 export interface IUpdateStockPrices {
   type: constants.UPDATE_STOCK_PRICES;
-  stockPrices:IStockPriceMap;
+  stockPrices: IStockPriceMap;
 }
 export const updateStockPrices = (
   stockPrices: IStockPriceMap
@@ -127,25 +118,10 @@ export interface IExecuteQuery {
   type: constants.EXECUTE_QUERY;
   query: IQuery;
 }
-// export const executeQuery = (
-//   query: IQuery
-// ): ThunkAction<Promise<void>, IState, {}, Action> => async (
-//   dispatch: Dispatch<Action>
-// ) => {
-//   dispatch(<IExecuteQuery>{
-//     type: constants.EXECUTE_QUERY,
-//     query
-//   });
-//   try {
-//     const fetchResult = await quandl.fetchStockPrice(query.tickerSymbol);
-//     const execution = createExecution(fetchResult, query);
-//   } catch (error) {
-//     // TODO
-//   }
-// };
 
 export type Action =
-  | IUpdateQuery
+  | IUpdateInput
+  | ISetParserMessage
   | IExecuteQuery
   | IUpdateStockPrices
   | IFetchStockPrice

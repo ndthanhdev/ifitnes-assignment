@@ -30,7 +30,7 @@ export const QueryBar: React.FC = () => {
   return (
     <Paper className={classes.root}>
       <InputBase
-        placeholder="Start input your queries here..."
+        placeholder="Start tying your queries ..."
         className={classes.inputBase}
         onChange={e => debounceDispatch(updateInput(e.target.value))}
         inputProps={{ className: classes.input }}

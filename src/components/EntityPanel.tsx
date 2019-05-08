@@ -6,7 +6,6 @@ import { SideList } from "./SideList";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
 import moment from "moment";
-import _ from "lodash";
 
 function shouldOpenSideList(entity: IEntity) {
   if (entity.type === "Combination") {

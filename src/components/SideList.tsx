@@ -12,7 +12,6 @@ import {
   Tab,
   Grid
 } from "@material-ui/core";
-import clsx from "clsx";
 import { IEntity, ITickerEntity } from "../interfaces/Entity";
 import { useStockPrices } from "./StockPriceChart";
 import { TableCellProps } from "@material-ui/core/TableCell";
