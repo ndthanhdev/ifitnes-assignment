@@ -1,7 +1,6 @@
 import React from "react";
-import { InputBase, Paper, IconButton } from "@material-ui/core";
+import { InputBase, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import SearchIcon from "@material-ui/icons/Search";
 import { useDispatch } from "react-redux";
 import { updateInput } from "../store/actions";
 import _ from "lodash";
@@ -13,9 +12,10 @@ const useStyles = makeStyles({
   inputBase: {
     flex: 1,
     marginLeft: "0.5rem",
+    height: "3rem"
   },
-  input:{
-    "text-transform": "uppercase"
+  input: {
+    textTransform: "uppercase"
   },
   iconButton: {
     padding: "0.5rem"
@@ -24,20 +24,17 @@ const useStyles = makeStyles({
 
 export const QueryBar: React.FC = () => {
   const classes = useStyles();
-  const dispatch = useDispatch()
-  const debounceDispatch = _.debounce(dispatch,500)
+  const dispatch = useDispatch();
+  const debounceDispatch = _.debounce(dispatch, 500);
 
   return (
     <Paper className={classes.root}>
       <InputBase
-        placeholder="<ticket symbol> <value>"
+        placeholder="Start input your queries here..."
         className={classes.inputBase}
-        onChange={e=>debounceDispatch(updateInput(e.target.value))}
-        inputProps={{className: classes.input}}
+        onChange={e => debounceDispatch(updateInput(e.target.value))}
+        inputProps={{ className: classes.input }}
       />
-      <IconButton className={classes.iconButton} aria-label="Search" >
-        <SearchIcon />
-      </IconButton>
     </Paper>
   );
 };

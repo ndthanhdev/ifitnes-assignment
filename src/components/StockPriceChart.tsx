@@ -25,7 +25,6 @@ import { Moment } from "moment";
 import { IEntity, ITickerEntity } from "../interfaces/Entity";
 import { IVisualTicker } from "../interfaces/VisualTicker";
 
-
 function createVisualTicker(
   tickerEntities: ITickerEntity[],
   stockPrices: IStockPriceMap,
@@ -111,13 +110,15 @@ interface IProps {
   timeRange: number;
   setTimeRange: (timeRange: number) => any;
   notBefore: Moment;
+  className?:string;
 }
 
 export const StockPriceChart: React.FC<IProps> = ({
   entity,
   timeRange,
   setTimeRange,
-  notBefore
+  notBefore,
+  className = ''
 }) => {
   function handleTabChange(event: any, newValue: any) {
     setTimeRange(parseInt(newValue));
@@ -150,7 +151,7 @@ export const StockPriceChart: React.FC<IProps> = ({
   let prices = !isLoading && !errorMessage ? createPrices(visualTickers) : [];
 
   return (
-    <Paper className={classes.flexContainer}>
+    <Paper className={`${classes.flexContainer} ${className}`}>
       <Grid
         container
         direction="column"

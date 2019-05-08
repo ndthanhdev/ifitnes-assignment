@@ -1,17 +1,12 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import {
   AutoSizer,
   Table,
   Column,
-  SortDirection,
-  SortDirectionType,
-  TableHeaderProps,
-  TableProps
 } from "react-virtualized";
 import {
   makeStyles,
   TableCell,
-  TableSortLabel,
   Paper,
   Tabs,
   Tab,
@@ -19,17 +14,17 @@ import {
 } from "@material-ui/core";
 import clsx from "clsx";
 import { IEntity, ITickerEntity } from "../interfaces/Entity";
-import { useSelector } from "react-redux";
-import { IState, IStockPriceMap } from "../store/reducer";
 import { useStockPrices } from "./StockPriceChart";
 import { TableCellProps } from "@material-ui/core/TableCell";
 import { Moment } from "moment";
 
 function createTabs(entity: IEntity) {
   if (entity.type === "TickerEntity") {
-    return [entity.tickerSymbol];
+    return entity.base !== undefined ? [entity.tickerSymbol] : [];
   } else if (entity.type === "Combination") {
-    return entity.queries.map(query => query.tickerSymbol);
+    return entity.queries
+      .filter(query => query.tickerSymbol && Boolean(query.base))
+      .map(query => query.tickerSymbol);
   }
 
   return [];
@@ -93,7 +88,7 @@ const useStyles = makeStyles({
     height: "100%"
   },
   tableCell: {
-    flex: 1,
+    flex: 1
   }
 });
 
@@ -186,7 +181,7 @@ export const SideList: React.FC<IProps> = ({ entity, notBefore }) => {
                 <Column
                   dataKey={"date"}
                   width={0}
-                  flexGrow={1}
+                  flexGrow={120}
                   className={classes.flexContainer}
                   headerRenderer={() =>
                     headerRenderer({
@@ -201,7 +196,7 @@ export const SideList: React.FC<IProps> = ({ entity, notBefore }) => {
                 <Column
                   dataKey={"close"}
                   flexGrow={1}
-                  width={0}
+                  width={120}
                   className={classes.flexContainer}
                   headerRenderer={() =>
                     headerRenderer({

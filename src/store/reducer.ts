@@ -1,6 +1,5 @@
 import { Action } from "./actions";
 import * as constants from "./constants";
-import { IQuery } from "../interfaces/Query";
 import { IStockPrice } from "../interfaces/StockPrice";
 import { IEntity } from "../interfaces/Entity";
 

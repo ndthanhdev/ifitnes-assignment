@@ -1,16 +1,12 @@
 import peg from "pegjs";
-import {
-  IEntity,
-  ITickerEntity,
-  ICombination
-} from "../interfaces/Entity";
+import { IEntity, ITickerEntity, ICombination } from "../interfaces/Entity";
 
 const grammar = `
 Expression
-	= Entity*
+  = Entity*
 
 Entity
- 	= Combination
+  = Combination
     / TickerEntity
 
 Combination
@@ -24,7 +20,7 @@ Combination
           queries:[left]
         })
   }
- 
+
 TickerEntity
   = tickerSymbol:TickerSymbol operator:Operator? base:(Base)? {
     return {
@@ -39,7 +35,7 @@ Operator
   = _ op:(">"/"<") _ {
       return op
     }
-  
+
 Base
   = _ [0-9]+("."[0-9]*)? _ { return parseFloat(text(), 10); }
 
@@ -52,9 +48,9 @@ _ "whitespace"
 
 const parser = peg.generate(grammar);
 
-class InvalidType extends Error{
+class InvalidType extends Error {
   constructor() {
-    super('Input has invalid type');
+    super("Input has invalid type");
   }
 }
 

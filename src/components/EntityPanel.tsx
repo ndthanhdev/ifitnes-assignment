@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { IEntity, ITickerEntity } from "../interfaces/Entity";
+import { IEntity } from "../interfaces/Entity";
 import { Grid, makeStyles, Tabs, Tab } from "@material-ui/core";
 import { StockPriceChart } from "./StockPriceChart";
 import { SideList } from "./SideList";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import { useTheme } from "@material-ui/core/styles";
-import moment, { Moment } from "moment";
+import moment from "moment";
+import _ from "lodash";
 
 function shouldOpenSideList(entity: IEntity) {
   if (entity.type === "Combination") {
@@ -15,7 +16,6 @@ function shouldOpenSideList(entity: IEntity) {
   }
   return false;
 }
-
 
 function getNotBefore(rangeIndex: number) {
   let result = moment("20180327");
@@ -47,7 +47,7 @@ function getNotBefore(rangeIndex: number) {
 }
 
 const useStyles = makeStyles({
-  wideContainer: {
+  container: {
     height: "24rem"
   },
   tabWrapperParent: {
@@ -64,6 +64,16 @@ const useStyles = makeStyles({
     // height: "24rem",
     flexGrow: 1
   },
+  chartContainer: {
+    position: "relative"
+  },
+  chart: {
+    right: 0,
+    left: 0,
+    top: 0,
+    bottom: 0,
+    position: "absolute"
+  }
 });
 
 interface IProps {
@@ -72,7 +82,7 @@ interface IProps {
 
 export const EntityPanel: React.FC<IProps> = ({ entity }) => {
   const theme = useTheme() as any;
-  const isWideScreen = useMediaQuery(theme.breakpoints.up("md"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.up("md"));
 
   const classes = useStyles();
 
@@ -80,18 +90,25 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
 
   const [tabId, setTabId] = useState(0);
 
-  const [timeRange, setTimeRange] = React.useState(0);  
+  const [timeRange, setTimeRange] = React.useState(0);
 
   let notBefore = getNotBefore(timeRange);
 
+  // let chartContainerRef: any;
+
+  // const [size, setSize] = useState(window.innerWidth);
+  // const handleResize = _.debounce(() => {
+  //   setSize(chartContainerRef.width);
+  // }, 166);
+
   return (
     <>
-      {isWideScreen && (
+      {isMediumScreen && (
         <Grid
           container
           justify="center"
           spacing={1}
-          className={classes.wideContainer}
+          className={classes.container}
         >
           {/* chart */}
           <Grid
@@ -99,19 +116,27 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
             container
             direction="column"
             md={isOpenSideList ? 9 : 12}
-            lg={isOpenSideList ? 7 : 10}
+            lg={isOpenSideList ? 8 : 10}
           >
-            <StockPriceChart entity={entity} timeRange={timeRange} setTimeRange={setTimeRange} notBefore={notBefore}/>
+            <Grid item xs={12} className={classes.chartContainer}>
+              <StockPriceChart
+                entity={entity}
+                timeRange={timeRange}
+                setTimeRange={setTimeRange}
+                notBefore={notBefore}
+                className={classes.chart}
+              />
+            </Grid>
           </Grid>
           {isOpenSideList && (
-            <Grid item container direction="column" md={3}>
-              <SideList entity={entity} notBefore={notBefore}/>
+            <Grid item container direction="column" md={3} lg={2}>
+              <SideList entity={entity} notBefore={notBefore} />
             </Grid>
           )}
         </Grid>
       )}
-      {!isWideScreen && (
-        <Grid container direction="column" className={classes.wideContainer}>
+      {!isMediumScreen && (
+        <Grid container direction="column" className={classes.container}>
           <Grid item>
             <div className={classes.tabWrapperParent}>
               <div className={classes.tabWrapper}>
@@ -126,9 +151,19 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
               </div>
             </div>
           </Grid>
-          <Grid item container className={classes.growUpContainer}>
-            {tabId === 0 && <StockPriceChart entity={entity} timeRange={timeRange} setTimeRange={setTimeRange} notBefore={notBefore}/>}
-            {isOpenSideList && tabId === 1 && <SideList entity={entity} notBefore={notBefore}/>}
+          <Grid item container className={`${classes.growUpContainer} ${classes.chartContainer}`}>
+            {tabId === 0 && (
+              <StockPriceChart
+                entity={entity}
+                timeRange={timeRange}
+                setTimeRange={setTimeRange}
+                notBefore={notBefore}
+                className={classes.chart}
+              />
+            )}
+            {isOpenSideList && tabId === 1 && (
+              <SideList entity={entity} notBefore={notBefore} />
+            )}
           </Grid>
         </Grid>
       )}
