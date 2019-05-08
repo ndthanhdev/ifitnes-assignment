@@ -21,38 +21,10 @@ import { useSelector } from "react-redux";
 import _ from "lodash";
 import randomcolor from "randomcolor";
 import { IState, IStockPriceMap } from "../store/reducer";
-import moment, { Moment } from "moment";
+import { Moment } from "moment";
 import { IEntity, ITickerEntity } from "../interfaces/Entity";
 import { IVisualTicker } from "../interfaces/VisualTicker";
 
-function getNotBefore(rangeIndex: number) {
-  let result = moment("20180327");
-
-  switch (rangeIndex) {
-    case 0:
-      result.subtract(1, "week");
-      break;
-    case 1:
-      result.subtract(1, "month");
-      break;
-    case 2:
-      result.subtract(3, "months");
-      break;
-    case 3:
-      result.subtract(6, "months");
-      break;
-    case 4:
-      result.subtract(1, "year");
-      break;
-    case 5:
-      result.subtract(5, "years");
-      break;
-    default:
-      result = moment("19450101");
-      break;
-  }
-  return result;
-}
 
 function createVisualTicker(
   tickerEntities: ITickerEntity[],
@@ -111,8 +83,8 @@ export const useStockPrices = () => {
 };
 
 const useStyles = makeStyles({
-  flexContainer:{
-    display: 'flex',
+  flexContainer: {
+    display: "flex",
     flexGrow: 1
   },
   container: {
@@ -136,11 +108,19 @@ const useStyles = makeStyles({
 
 interface IProps {
   entity: IEntity;
+  timeRange: number;
+  setTimeRange: (timeRange: number) => any;
+  notBefore: Moment;
 }
 
-export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
+export const StockPriceChart: React.FC<IProps> = ({
+  entity,
+  timeRange,
+  setTimeRange,
+  notBefore
+}) => {
   function handleTabChange(event: any, newValue: any) {
-    setRange(newValue);
+    setTimeRange(parseInt(newValue));
   }
 
   const stockPrices = useStockPrices();
@@ -154,9 +134,6 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
   }
 
   const title = tickerEntities.map(entity => entity.tickerSymbol).join(" | ");
-
-  const [range, setRange] = React.useState(0);
-  let notBefore = getNotBefore(range);
 
   const visualTickers = createVisualTicker(
     tickerEntities,
@@ -174,7 +151,12 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
 
   return (
     <Paper className={classes.flexContainer}>
-      <Grid container direction="column" spacing={1} className={classes.container}>
+      <Grid
+        container
+        direction="column"
+        spacing={1}
+        className={classes.container}
+      >
         <Grid item>
           <Typography variant="h6" color="primary" align="center">
             {title}
@@ -184,7 +166,7 @@ export const StockPriceChart: React.FC<IProps> = ({ entity }) => {
           <div className={classes.tabWrapperParent}>
             <div className={classes.tabWrapper}>
               <Tabs
-                value={range}
+                value={timeRange}
                 onChange={handleTabChange}
                 scrollButtons="auto"
                 variant="scrollable"

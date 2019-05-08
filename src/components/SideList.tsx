@@ -23,6 +23,7 @@ import { useSelector } from "react-redux";
 import { IState, IStockPriceMap } from "../store/reducer";
 import { useStockPrices } from "./StockPriceChart";
 import { TableCellProps } from "@material-ui/core/TableCell";
+import { Moment } from "moment";
 
 function createTabs(entity: IEntity) {
   if (entity.type === "TickerEntity") {
@@ -42,7 +43,7 @@ function getTickerEntity(entity: IEntity, index: number) {
   }
 }
 
-function useRows(entity?: ITickerEntity) {
+function useRows(notBefore: Moment, entity?: ITickerEntity) {
   const stockPricesMap = useStockPrices();
 
   if (!entity) {
@@ -50,7 +51,10 @@ function useRows(entity?: ITickerEntity) {
   }
 
   if (stockPricesMap[entity.tickerSymbol]) {
-    const prices = stockPricesMap[entity.tickerSymbol].prices || [];
+    const prices = (stockPricesMap[entity.tickerSymbol].prices || []).filter(
+      price => notBefore.isBefore(price.date)
+    );
+
     const base = entity.base;
     if (base) {
       if (entity.operator === ">") {
@@ -84,17 +88,56 @@ const useStyles = makeStyles({
     position: "absolute",
     left: 0,
     right: 0
+  },
+  gridContainer: {
+    height: "100%"
+  },
+  tableCell: {
+    flex: 1,
   }
 });
 
 interface IProps {
   entity: IEntity;
+  notBefore: Moment;
 }
 
-export const SideList: React.FC<IProps> = ({ entity }) => {
+export const SideList: React.FC<IProps> = ({ entity, notBefore }) => {
+  const classes = useStyles();
+
+  const headerRenderer: React.FC<IHeaderRendererProps> = ({ label, align }) => {
+    return (
+      <TableCell
+        component="div"
+        variant="head"
+        align={align}
+        className={`${classes.tableCell} ${classes.flexContainer}`}
+      >
+        {label}
+      </TableCell>
+    );
+  };
+
+  const cellRenderer: React.FC<ICellRendererProps> = ({
+    cellData,
+    columnIndex
+  }) => {
+    const align = columnIndex === 0 ? "left" : "right";
+
+    return (
+      <TableCell
+        component="div"
+        variant="body"
+        align={align}
+        className={classes.tableCell}
+      >
+        {cellData}
+      </TableCell>
+    );
+  };
+
   const rowHeight = 48;
   const headerHeight = 48;
-  const classes = useStyles();
 
   const tabs = createTabs(entity);
   const [tabIndex, setTabIndex] = React.useState(0);
@@ -104,70 +147,76 @@ export const SideList: React.FC<IProps> = ({ entity }) => {
 
   const tickerEntity = getTickerEntity(entity, tabIndex);
 
-  const rows = useRows(tickerEntity);
+  const rows = useRows(notBefore, tickerEntity);
 
   return (
     <Paper className={`${classes.growUpContainer}`}>
-      {tabs.length > 1 && (
-        <div className={classes.tabWrapperParent}>
-          <div className={classes.tabWrapper}>
-            <Tabs
-              value={tabIndex}
-              onChange={handleTabChange}
-              scrollButtons="auto"
-              variant="scrollable"
-            >
-              {tabs.map((tab, index) => (
-                <Tab label={tab} key={index} />
-              ))}
-            </Tabs>
-          </div>
-        </div>
-      )}
-      <Grid container className={classes.growUpContainer}>
-        <AutoSizer className={classes.growUpContainer}>
-          {autoSizerChildProps => (
-            <Table
-              {...autoSizerChildProps}
-              rowHeight={rowHeight}
-              rowCount={rows.length}
-              headerHeight={headerHeight}
-              rowGetter={({ index }) => rows[index]}
-              rowClassName={classes.flexContainer}
-              height={autoSizerChildProps.height}
-              width={autoSizerChildProps.width}
-            >
-              <Column
-                dataKey={"date"}
-                width={120}
-                className={classes.flexContainer}
-                headerRenderer={() =>
-                  headerRenderer({
-                    label: "Date",
-                    align: "left"
-                  })
-                }
-                cellRenderer={({ cellData, columnIndex }) =>
-                  cellRenderer({ cellData, columnIndex })
-                }
-              />
-              <Column
-                dataKey={"close"}
-                width={120}
-                className={classes.flexContainer}
-                headerRenderer={() =>
-                  headerRenderer({
-                    label: "Close price",
-                    align: "right"
-                  })
-                }
-                cellRenderer={({ cellData, columnIndex }) =>
-                  cellRenderer({ cellData, columnIndex })
-                }
-              />
-            </Table>
+      <Grid container direction="column" className={classes.gridContainer}>
+        <Grid item>
+          {tabs.length > 1 && (
+            <div className={classes.tabWrapperParent}>
+              <div className={classes.tabWrapper}>
+                <Tabs
+                  value={tabIndex}
+                  onChange={handleTabChange}
+                  scrollButtons="auto"
+                  variant="scrollable"
+                >
+                  {tabs.map((tab, index) => (
+                    <Tab label={tab} key={index} />
+                  ))}
+                </Tabs>
+              </div>
+            </div>
           )}
-        </AutoSizer>
+        </Grid>
+        <Grid item className={classes.growUpContainer}>
+          <AutoSizer className={classes.growUpContainer}>
+            {autoSizerChildProps => (
+              <Table
+                {...autoSizerChildProps}
+                rowHeight={rowHeight}
+                rowCount={rows.length}
+                headerHeight={headerHeight}
+                rowGetter={({ index }) => rows[index]}
+                rowClassName={classes.flexContainer}
+                height={autoSizerChildProps.height}
+                width={autoSizerChildProps.width}
+              >
+                <Column
+                  dataKey={"date"}
+                  width={0}
+                  flexGrow={1}
+                  className={classes.flexContainer}
+                  headerRenderer={() =>
+                    headerRenderer({
+                      label: "Date",
+                      align: "left"
+                    })
+                  }
+                  cellRenderer={({ cellData, columnIndex }) =>
+                    cellRenderer({ cellData, columnIndex })
+                  }
+                />
+                <Column
+                  dataKey={"close"}
+                  flexGrow={1}
+                  width={0}
+                  className={classes.flexContainer}
+                  headerRenderer={() =>
+                    headerRenderer({
+                      label: "Close price",
+                      align: "right"
+                    })
+                  }
+                  cellRenderer={({ cellData, columnIndex }) =>
+                    cellRenderer({ cellData, columnIndex })
+                  }
+                />
+              </Table>
+            )}
+          </AutoSizer>
+        </Grid>
       </Grid>
     </Paper>
   );
@@ -177,30 +226,7 @@ interface IHeaderRendererProps extends Pick<TableCellProps, "align"> {
   label: string;
 }
 
-export const headerRenderer: React.FC<IHeaderRendererProps> = ({
-  label,
-  align
-}) => {
-  return (
-    <TableCell component="div" variant="head" align={align}>
-      {label}
-    </TableCell>
-  );
-};
-
 interface ICellRendererProps {
   cellData: any;
   columnIndex: number;
 }
-export const cellRenderer: React.FC<ICellRendererProps> = ({
-  cellData,
-  columnIndex
-}) => {
-  const align = columnIndex === 0 ? "left" : "right";
-
-  return (
-    <TableCell component="div" variant="body" align={align}>
-      {cellData}
-    </TableCell>
-  );
-};

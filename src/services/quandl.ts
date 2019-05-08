@@ -2,7 +2,7 @@ import axios from "axios";
 import { IStockPrice, IPrice } from "../interfaces/StockPrice";
 
 const baseUrl = "https://www.quandl.com/api/v3/datasets/WIKI/";
-
+const apiKey = 'api_key=L3cH3jADdPYnQsZTz3Rx'
 export class TickerSymbolNotFound extends Error {
   constructor(tickerSymbol: string) {
     super(`Ticker symbol ${tickerSymbol} not found`);
@@ -37,7 +37,7 @@ export const fetchStockPrice = async (
   tickerSymbol: string
 ): Promise<IStockPrice> => {
   try {
-    const { data } = await axios.get(`${baseUrl}/${tickerSymbol}.json`);
+    const { data } = await axios.get(`${baseUrl}/${tickerSymbol}.json?${apiKey}`);
     if (data.quandl_error && data.quandl_error.code === INCORRECT_CODE) {
       return {
         tickerSymbol: tickerSymbol,

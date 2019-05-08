@@ -41,7 +41,7 @@ export const MainPage: React.FC = () => {
   const entities = useEntities();
 
   return (
-    <Grid container direction="column" className={classes.root} spacing={1}>
+    <Grid container direction="column" className={classes.root} spacing={3}>
       <Grid item container justify="center">
         <Grid item xs={12} sm={10}>
           <QueryBar />
