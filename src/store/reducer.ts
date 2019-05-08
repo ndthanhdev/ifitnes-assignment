@@ -1,53 +1,55 @@
-import { Action } from "./actions";
-import * as constants from "./constants";
-import { IStockPrice } from "../interfaces/StockPrice";
-import { IEntity } from "../interfaces/Entity";
+import { Action } from './actions'
+import * as constants from './constants'
+import { IStockPrice } from '../interfaces/StockPrice'
+import { IEntity } from '../interfaces/Entity'
 
-export interface IStockPriceMap {
-  [tickerSymbol: string]: IStockPrice;
-}
-
-export interface IState {
-  input: string;
-  parserMessage?: string;
-  entities: IEntity[];
-  stockPriceMap: IStockPriceMap;
-}
-
-export const initialState: IState = {
-  input: "",
-  entities: [],
-  stockPriceMap: {}
-};
 
 function updateStockPrices(
   newStockPriceMap: IStockPriceMap,
   currentStockPriceMap: IStockPriceMap
 ) {
-  const theMap = { ...newStockPriceMap };
-  const tickerSymbols = Array.from(Object.keys(theMap));
+  const theMap = { ...newStockPriceMap }
+  const tickerSymbols = Array.from(Object.keys(theMap))
 
   for (const tickerSymbol of tickerSymbols) {
     theMap[tickerSymbol] = Object.assign(
       { ...theMap[tickerSymbol] },
       currentStockPriceMap[tickerSymbol]
-    );
+    )
   }
 
-  return theMap;
+  return theMap
 }
 
 function setStockPrices(
   stockPrice: IStockPrice,
   stockPriceMap: IStockPriceMap
 ) {
-  const theMap = { ...stockPriceMap };
+  const theMap = { ...stockPriceMap }
   theMap[stockPrice.tickerSymbol] = {
-    ...stockPrice
-  };
+    ...stockPrice,
+  }
 
-  return theMap;
+  return theMap
 }
+
+export interface IStockPriceMap {
+  [tickerSymbol: string]: IStockPrice
+}
+
+export interface IState {
+  input: string
+  parserMessage?: string
+  entities: IEntity[]
+  stockPriceMap: IStockPriceMap
+}
+
+export const initialState: IState = {
+  input: '',
+  entities: [],
+  stockPriceMap: {},
+}
+
 
 export const reducer = (
   state: IState = initialState,
@@ -57,34 +59,34 @@ export const reducer = (
     case constants.UPDATE_INPUT:
       return {
         ...state,
-        input: action.input
-      };
+        input: action.input,
+      }
     case constants.SET_PARSER_MESSAGE:
       return {
         ...state,
         entities: [],
-        parserMessage: action.message
-      };
+        parserMessage: action.message,
+      }
     case constants.SET_ENTITIES:
       return {
         ...state,
         entities: [...action.entities],
-        parserMessage: undefined
-      };
+        parserMessage: undefined,
+      }
     case constants.UPDATE_STOCK_PRICES:
       return {
         ...state,
         stockPriceMap: updateStockPrices(
           action.stockPrices,
           state.stockPriceMap
-        )
-      };
+        ),
+      }
     case constants.SET_STOCK_PRICE:
       return {
         ...state,
-        stockPriceMap: setStockPrices(action.stockPrice, state.stockPriceMap)
-      };
+        stockPriceMap: setStockPrices(action.stockPrice, state.stockPriceMap),
+      }
     default:
-      return { ...state };
+      return { ...state }
   }
-};
+}

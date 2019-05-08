@@ -1,104 +1,96 @@
-import React, { useState } from "react";
-import { IEntity } from "../interfaces/Entity";
-import { Grid, makeStyles, Tabs, Tab } from "@material-ui/core";
-import { StockPriceChart } from "./StockPriceChart";
-import { SideList } from "./SideList";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import { useTheme } from "@material-ui/core/styles";
-import moment from "moment";
+import React, { useState } from 'react'
+import { IEntity } from '../interfaces/Entity'
+import { Grid, makeStyles, Tabs, Tab } from '@material-ui/core'
+import { StockPriceChart } from './StockPriceChart'
+import { SideList } from './SideList'
+import useMediaQuery from '@material-ui/core/useMediaQuery'
+import { useTheme } from '@material-ui/core/styles'
+import moment from 'moment'
 
 function shouldOpenSideList(entity: IEntity) {
-  if (entity.type === "Combination") {
-    return entity.queries.some(query => Boolean(query.base));
-  } else if (entity.type === "TickerEntity") {
-    return Boolean(entity.base);
+  if (entity.type === 'Combination') {
+    return entity.queries.some(query => Boolean(query.base))
+  } else if (entity.type === 'TickerEntity') {
+    return Boolean(entity.base)
   }
-  return false;
+  return false
 }
 
 function getNotBefore(rangeIndex: number) {
-  let result = moment("20180327");
+  let result = moment('20180327')
 
   switch (rangeIndex) {
     case 0:
-      result.subtract(1, "week");
-      break;
+      result.subtract(1, 'week')
+      break
     case 1:
-      result.subtract(1, "month");
-      break;
+      result.subtract(1, 'month')
+      break
     case 2:
-      result.subtract(3, "months");
-      break;
+      result.subtract(3, 'months')
+      break
     case 3:
-      result.subtract(6, "months");
-      break;
+      result.subtract(6, 'months')
+      break
     case 4:
-      result.subtract(1, "year");
-      break;
+      result.subtract(1, 'year')
+      break
     case 5:
-      result.subtract(5, "years");
-      break;
+      result.subtract(5, 'years')
+      break
     default:
-      result = moment("19450101");
-      break;
+      result = moment('19450101')
+      break
   }
-  return result;
+  return result
 }
 
 const useStyles = makeStyles({
   container: {
-    height: "24rem"
+    height: '24rem',
   },
   tabWrapperParent: {
-    position: "relative",
-    overflow: "hidden",
-    height: "3rem"
+    position: 'relative',
+    overflow: 'hidden',
+    height: '3rem',
   },
   tabWrapper: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
-    right: 0
+    right: 0,
   },
   growUpContainer: {
-    // height: "24rem",
-    flexGrow: 1
+    flexGrow: 1,
   },
   chartContainer: {
-    position: "relative"
+    position: 'relative',
   },
   chart: {
     right: 0,
     left: 0,
     top: 0,
     bottom: 0,
-    position: "absolute"
-  }
-});
+    position: 'absolute',
+  },
+})
 
 interface IProps {
-  entity: IEntity;
+  entity: IEntity
 }
 
 export const EntityPanel: React.FC<IProps> = ({ entity }) => {
-  const theme = useTheme() as any;
-  const isMediumScreen = useMediaQuery(theme.breakpoints.up("md"));
+  const theme = useTheme() as any
+  const isMediumScreen = useMediaQuery(theme.breakpoints.up('md'))
 
-  const classes = useStyles();
+  const classes = useStyles()
 
-  const isOpenSideList = shouldOpenSideList(entity);
+  const isOpenSideList = shouldOpenSideList(entity)
 
-  const [tabId, setTabId] = useState(0);
+  const [tabId, setTabId] = useState(0)
 
-  const [timeRange, setTimeRange] = React.useState(0);
+  const [timeRange, setTimeRange] = React.useState(3)
 
-  let notBefore = getNotBefore(timeRange);
-
-  // let chartContainerRef: any;
-
-  // const [size, setSize] = useState(window.innerWidth);
-  // const handleResize = _.debounce(() => {
-  //   setSize(chartContainerRef.width);
-  // }, 166);
+  let notBefore = getNotBefore(timeRange)
 
   return (
     <>
@@ -109,7 +101,6 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
           spacing={1}
           className={classes.container}
         >
-          {/* chart */}
           <Grid
             item
             container
@@ -150,7 +141,11 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
               </div>
             </div>
           </Grid>
-          <Grid item container className={`${classes.growUpContainer} ${classes.chartContainer}`}>
+          <Grid
+            item
+            container
+            className={`${classes.growUpContainer} ${classes.chartContainer}`}
+          >
             {tabId === 0 && (
               <StockPriceChart
                 entity={entity}
@@ -167,5 +162,5 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
         </Grid>
       )}
     </>
-  );
-};
+  )
+}

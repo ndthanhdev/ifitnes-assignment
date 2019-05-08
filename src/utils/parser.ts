@@ -1,5 +1,5 @@
-import peg from "pegjs";
-import { IEntity, ITickerEntity, ICombination } from "../interfaces/Entity";
+import peg from 'pegjs'
+import { IEntity, ITickerEntity, ICombination } from '../interfaces/Entity'
 
 const grammar = `
 Expression
@@ -44,27 +44,27 @@ TickerSymbol "ticker symbol"
 
 _ "whitespace"
   = [ \\t\\n\\r]*
-`;
+`
 
-const parser = peg.generate(grammar);
+const parser = peg.generate(grammar)
 
 class InvalidType extends Error {
   constructor() {
-    super("Input has invalid type");
+    super('Input has invalid type')
   }
 }
 
 function createEntity(object: any): IEntity {
-  if (object.type === "TickerEntity") return object as ITickerEntity;
-  else if (object.type === "Combination") return object as ICombination;
-  throw new InvalidType();
+  if (object.type === 'TickerEntity') return object as ITickerEntity
+  else if (object.type === 'Combination') return object as ICombination
+  throw new InvalidType()
 }
 
 export const parse = (input: string): IEntity[] | string => {
   try {
-    const output = parser.parse(input) as Array<any>;
-    return output.map(createEntity);
+    const output = parser.parse(input) as Array<any>
+    return output.map(createEntity)
   } catch (error) {
-    return error.message;
+    return error.message
   }
-};
+}

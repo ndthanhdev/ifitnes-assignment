@@ -1,12 +1,12 @@
 export interface IPrice {
-  date: string;
-  close: number;
+  date: string
+  close: number
 }
 
 export interface IStockPrice {
-  tickerSymbol: string;
+  tickerSymbol: string
   // TODO: fetchedAt: Date;
-  error?: Error,
-  name?: string;
+  error?: Error
+  name?: string
   prices?: IPrice[]
 }

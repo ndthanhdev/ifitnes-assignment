@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react'
 import {
   XAxis,
   YAxis,
@@ -6,8 +6,8 @@ import {
   Tooltip,
   AreaChart,
   Area,
-  ReferenceLine
-} from "recharts";
+  ReferenceLine,
+} from 'recharts'
 import {
   Typography,
   Tab,
@@ -15,15 +15,15 @@ import {
   makeStyles,
   Paper,
   Grid,
-  CircularProgress
-} from "@material-ui/core";
-import { useSelector } from "react-redux";
-import _ from "lodash";
-import randomcolor from "randomcolor";
-import { IState, IStockPriceMap } from "../store/reducer";
-import { Moment } from "moment";
-import { IEntity, ITickerEntity } from "../interfaces/Entity";
-import { IVisualTicker } from "../interfaces/VisualTicker";
+  CircularProgress,
+} from '@material-ui/core'
+import { useSelector } from 'react-redux'
+import _ from 'lodash'
+import randomcolor from 'randomcolor'
+import { IState, IStockPriceMap } from '../store/reducer'
+import { Moment } from 'moment'
+import { IEntity, ITickerEntity } from '../interfaces/Entity'
+import { IVisualTicker } from '../interfaces/VisualTicker'
 
 function createVisualTicker(
   tickerEntities: ITickerEntity[],
@@ -37,80 +37,80 @@ function createVisualTicker(
       base: tickerEntity.base,
       isLoading: true,
       prices: [],
-      color: randomcolor({ seed: tickerEntity.tickerSymbol })
-    } as IVisualTicker;
+      color: randomcolor({ seed: tickerEntity.tickerSymbol }),
+    } as IVisualTicker
 
-    const stockPrice = stockPrices[tickerEntity.tickerSymbol];
+    const stockPrice = stockPrices[tickerEntity.tickerSymbol]
 
     if (stockPrice) {
-      result.error = stockPrice.error;
-      if (stockPrice.error || stockPrice.name) result.isLoading = false;
+      result.error = stockPrice.error
+      if (stockPrice.error || stockPrice.name) result.isLoading = false
       if (stockPrice.prices)
         result.prices = stockPrice.prices
           .filter(price => notBefore.isBefore(price.date))
           .map(({ date, close }) => ({
             date,
-            [tickerEntity.tickerSymbol]: close
-          }));
+            [tickerEntity.tickerSymbol]: close,
+          }))
     }
 
-    return result;
-  });
+    return result
+  })
 }
 
 function createPrices(tickers: IVisualTicker[]) {
-  let merged = _.mergeWith([], ...tickers.map(vTicker => vTicker.prices));
+  let merged = _.mergeWith([], ...tickers.map(vTicker => vTicker.prices))
 
   return Object.keys(merged).map(k => ({
     date: k,
-    ...merged[k]
-  }));
+    ...merged[k],
+  }))
 }
 
 function getErrorMessage(tickers: IVisualTicker[]) {
-  const errorTicker = tickers.find(vTicker => Boolean(vTicker.error));
+  const errorTicker = tickers.find(vTicker => Boolean(vTicker.error))
 
   if (errorTicker && errorTicker.error) {
-    return errorTicker.error.message;
+    return errorTicker.error.message
   }
 
-  return undefined;
+  return undefined
 }
 
 export const useStockPrices = () => {
-  return useSelector((state: IState) => state.stockPriceMap);
-};
+  return useSelector((state: IState) => state.stockPriceMap)
+}
 
 const useStyles = makeStyles({
   flexContainer: {
-    display: "flex",
-    flexGrow: 1
+    display: 'flex',
+    flexGrow: 1,
   },
   container: {
     // height: "24rem",
-    flexGrow: 1
+    flexGrow: 1,
   },
   chartContainer: {
-    "flex-grow": 1
+    'flex-grow': 1,
   },
   tabWrapperParent: {
-    position: "relative",
-    overflow: "hidden",
-    height: "3rem"
+    position: 'relative',
+    overflow: 'hidden',
+    height: '3rem',
   },
   tabWrapper: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
-    right: 0
-  }
-});
+    right: 0,
+  },
+})
 
 interface IProps {
-  entity: IEntity;
-  timeRange: number;
-  setTimeRange: (timeRange: number) => any;
-  notBefore: Moment;
-  className?:string;
+  entity: IEntity
+  timeRange: number
+  setTimeRange: (timeRange: number) => any
+  notBefore: Moment
+  className?: string
 }
 
 export const StockPriceChart: React.FC<IProps> = ({
@@ -118,37 +118,37 @@ export const StockPriceChart: React.FC<IProps> = ({
   timeRange,
   setTimeRange,
   notBefore,
-  className = ''
+  className = '',
 }) => {
   function handleTabChange(event: any, newValue: any) {
-    setTimeRange(parseInt(newValue));
+    setTimeRange(parseInt(newValue))
   }
 
-  const stockPrices = useStockPrices();
+  const stockPrices = useStockPrices()
 
-  let tickerEntities: ITickerEntity[] = [];
+  let tickerEntities: ITickerEntity[] = []
 
-  if (entity.type === "TickerEntity") {
-    tickerEntities.push(entity);
-  } else if (entity.type === "Combination") {
-    tickerEntities.push(...entity.queries);
+  if (entity.type === 'TickerEntity') {
+    tickerEntities.push(entity)
+  } else if (entity.type === 'Combination') {
+    tickerEntities.push(...entity.queries)
   }
 
-  const title = tickerEntities.map(entity => entity.tickerSymbol).join(" | ");
+  const title = tickerEntities.map(entity => entity.tickerSymbol).join(' | ')
 
   const visualTickers = createVisualTicker(
     tickerEntities,
     stockPrices,
     notBefore
-  );
+  )
 
-  const classes = useStyles();
+  const classes = useStyles()
 
-  let isLoading = visualTickers.some(vTicker => vTicker.isLoading);
+  let isLoading = visualTickers.some(vTicker => vTicker.isLoading)
 
-  let errorMessage = getErrorMessage(visualTickers);
+  let errorMessage = getErrorMessage(visualTickers)
 
-  let prices = !isLoading && !errorMessage ? createPrices(visualTickers) : [];
+  let prices = !isLoading && !errorMessage ? createPrices(visualTickers) : []
 
   return (
     <Paper className={`${classes.flexContainer} ${className}`}>
@@ -196,7 +196,7 @@ export const StockPriceChart: React.FC<IProps> = ({
                 <defs>
                   {visualTickers.map(vTicker => (
                     <linearGradient
-                      key={vTicker.tickerSymbol + "gradient"}
+                      key={vTicker.tickerSymbol + 'gradient'}
                       id={vTicker.tickerSymbol}
                       x1="0"
                       y1="0"
@@ -209,7 +209,7 @@ export const StockPriceChart: React.FC<IProps> = ({
                         stopOpacity={0.5}
                       />
                       <stop
-                        offset="80%"
+                        offset="15%"
                         stopColor={vTicker.color}
                         stopOpacity={0}
                       />
@@ -218,7 +218,7 @@ export const StockPriceChart: React.FC<IProps> = ({
                 </defs>
                 {visualTickers.map(vTicker => (
                   <Area
-                    key={vTicker.tickerSymbol + "area"}
+                    key={vTicker.tickerSymbol + 'area'}
                     type="monotone"
                     dataKey={vTicker.tickerSymbol}
                     stroke={vTicker.color}
@@ -230,14 +230,14 @@ export const StockPriceChart: React.FC<IProps> = ({
                   return (
                     vTicker.base !== undefined && (
                       <ReferenceLine
-                        key={vTicker.tickerSymbol + "refLine"}
+                        key={vTicker.tickerSymbol + 'refLine'}
                         y={vTicker.base}
                         stroke={vTicker.color}
                         label={`${vTicker.base}`}
                         strokeDasharray="3 3"
                       />
                     )
-                  );
+                  )
                 })}
                 <XAxis dataKey="date" reversed />
                 <YAxis />
@@ -254,5 +254,5 @@ export const StockPriceChart: React.FC<IProps> = ({
         </Grid>
       </Grid>
     </Paper>
-  );
-};
+  )
+}

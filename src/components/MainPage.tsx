@@ -1,47 +1,47 @@
-import React from "react";
-import { Grid, Typography } from "@material-ui/core";
-import { QueryBar } from "./QueryBar";
-import { makeStyles } from "@material-ui/styles";
-import { useSelector } from "react-redux";
-import { IState } from "../store/reducer";
-import { EntityPanel } from "./EntityPanel";
-import { Tutorial } from "./Tutorial";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import React from 'react'
+import { Grid, Typography } from '@material-ui/core'
+import { QueryBar } from './QueryBar'
+import { makeStyles } from '@material-ui/styles'
+import { useSelector } from 'react-redux'
+import { IState } from '../store/reducer'
+import { EntityPanel } from './EntityPanel'
+import { Tutorial } from './Tutorial'
+import CssBaseline from '@material-ui/core/CssBaseline'
 
 const useEntities = () => {
-  return useSelector((state: IState) => state.entities);
-};
+  return useSelector((state: IState) => state.entities)
+}
 
 const useParserMessage = () => {
-  return useSelector((state: IState) => state.parserMessage);
-};
+  return useSelector((state: IState) => state.parserMessage)
+}
 
 const useStyles = makeStyles({
   root: {
-    padding: "1rem 0.5rem"
+    padding: '1rem 0.5rem',
   },
   entityPanel: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
-    bottom: 0
+    bottom: 0,
   },
   entityPanelContainer: {
-    position: "relative"
+    position: 'relative',
   },
   fullWidth: {
-    width: "100%"
+    width: '100%',
   },
   parserMessageContainer: {
-    height: "20rem"
-  }
-});
+    height: '20rem',
+  },
+})
 
 export const MainPage: React.FC = () => {
-  const classes = useStyles();
-  const entities = useEntities();
-  const parserMessage = useParserMessage();
+  const classes = useStyles()
+  const entities = useEntities()
+  const parserMessage = useParserMessage()
 
   return (
     <div>
@@ -60,7 +60,7 @@ export const MainPage: React.FC = () => {
                   <EntityPanel entity={entity} />
                 </Grid>
               </Grid>
-            );
+            )
           })}
           {!parserMessage && entities.length === 0 && (
             <Grid item xs={12} lg={10} className={classes.fullWidth}>
@@ -77,5 +77,5 @@ export const MainPage: React.FC = () => {
         </Grid>
       </Grid>
     </div>
-  );
-};
+  )
+}

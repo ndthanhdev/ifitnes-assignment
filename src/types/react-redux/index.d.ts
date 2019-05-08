@@ -1,7 +1,7 @@
-import * as origin from "react-redux";
+import * as origin from 'react-redux'
 
-declare module "react-redux" {
-  export * from origin;
+declare module 'react-redux' {
+  export * from origin
 
   /**
    * A hook to access the redux `dispatch` function. Note that in most cases where you
@@ -26,7 +26,7 @@ declare module "react-redux" {
    *   )
    * }
    */
-  export function useDispatch<A extends Action = any>(): Dispatch<A>;
+  export function useDispatch<A extends Action = any>(): Dispatch<A>
 
   /**
    * A hook to access the redux store's state. This hook takes a selector function
@@ -56,7 +56,7 @@ declare module "react-redux" {
   export function useSelector<TState, TSelected>(
     selector: (state: TState) => TSelected,
     deps?: ReadonlyArray<any>
-  ): TSelected;
+  ): TSelected
 
   /**
    * A hook to access the redux store.
@@ -73,8 +73,5 @@ declare module "react-redux" {
    *   return <div>{store.getState()}</div>
    * }
    */
-  export function useStore<S = any, A extends Action = AnyAction>(): Store<
-    S,
-    A
-  >;
+  export function useStore<S = any, A extends Action = AnyAction>(): Store<S, A>
 }
