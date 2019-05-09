@@ -5,8 +5,8 @@ import { IEntity } from '../interfaces/Entity'
 
 
 function updateStockPrices(
-  newStockPriceMap: IStockPriceMap,
-  currentStockPriceMap: IStockPriceMap
+  newStockPriceMap: IStockPricesMap,
+  currentStockPriceMap: IStockPricesMap
 ) {
   const theMap = { ...newStockPriceMap }
   const tickerSymbols = Array.from(Object.keys(theMap))
@@ -23,7 +23,7 @@ function updateStockPrices(
 
 function setStockPrices(
   stockPrice: IStockPrice,
-  stockPriceMap: IStockPriceMap
+  stockPriceMap: IStockPricesMap
 ) {
   const theMap = { ...stockPriceMap }
   theMap[stockPrice.tickerSymbol] = {
@@ -33,7 +33,7 @@ function setStockPrices(
   return theMap
 }
 
-export interface IStockPriceMap {
+export interface IStockPricesMap {
   [tickerSymbol: string]: IStockPrice
 }
 
@@ -41,7 +41,7 @@ export interface IState {
   input: string
   parserMessage?: string
   entities: IEntity[]
-  stockPriceMap: IStockPriceMap
+  stockPriceMap: IStockPricesMap
 }
 
 export const initialState: IState = {

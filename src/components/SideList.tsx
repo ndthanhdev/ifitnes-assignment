@@ -9,9 +9,9 @@ import {
   Grid,
 } from '@material-ui/core'
 import { IEntity, ITickerEntity } from '../interfaces/Entity'
-import { useStockPrices } from './StockPriceChart'
 import { TableCellProps } from '@material-ui/core/TableCell'
 import { Moment } from 'moment'
+import { IStockPricesMap } from '../store/reducer'
 
 function createTabs(entity: IEntity) {
   if (entity.type === 'TickerEntity') {
@@ -33,9 +33,11 @@ function getTickerEntity(entity: IEntity, index: number) {
   }
 }
 
-function useRows(notBefore: Moment, entity?: ITickerEntity) {
-  const stockPricesMap = useStockPrices()
-
+function getRows(
+  notBefore: Moment,
+  stockPricesMap: IStockPricesMap,
+  entity?: ITickerEntity
+) {
   if (!entity) {
     return []
   }
@@ -87,10 +89,19 @@ const useStyles = makeStyles({
 interface IProps {
   entity: IEntity
   notBefore: Moment
+  stockPrices: IStockPricesMap
 }
 
-export const SideList: React.FC<IProps> = ({ entity, notBefore }) => {
+export const SideList: React.FC<IProps> = ({
+  entity,
+  notBefore,
+  stockPrices,
+}) => {
   const classes = useStyles()
+
+  interface IHeaderRendererProps extends Pick<TableCellProps, 'align'> {
+    label: string
+  }
 
   const headerRenderer: React.FC<IHeaderRendererProps> = ({ label, align }) => {
     return (
@@ -103,6 +114,11 @@ export const SideList: React.FC<IProps> = ({ entity, notBefore }) => {
         {label}
       </TableCell>
     )
+  }
+
+  interface ICellRendererProps {
+    cellData: any
+    columnIndex: number
   }
 
   const cellRenderer: React.FC<ICellRendererProps> = ({
@@ -134,7 +150,7 @@ export const SideList: React.FC<IProps> = ({ entity, notBefore }) => {
 
   const tickerEntity = getTickerEntity(entity, tabIndex)
 
-  const rows = useRows(notBefore, tickerEntity)
+  const rows = getRows(notBefore, stockPrices, tickerEntity)
 
   return (
     <Paper className={`${classes.growUpContainer}`}>
@@ -207,13 +223,4 @@ export const SideList: React.FC<IProps> = ({ entity, notBefore }) => {
       </Grid>
     </Paper>
   )
-}
-
-interface IHeaderRendererProps extends Pick<TableCellProps, 'align'> {
-  label: string
-}
-
-interface ICellRendererProps {
-  cellData: any
-  columnIndex: number
 }

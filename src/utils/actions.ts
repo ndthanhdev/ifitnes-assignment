@@ -1,6 +1,6 @@
 import { IEntity } from '../interfaces/Entity'
 import { IStockPrice } from '../interfaces/StockPrice'
-import { IStockPriceMap } from '../store/reducer'
+import { IStockPricesMap } from '../store/reducer'
 
 function createStockPrice(tickerSymbol: string) {
   return {
@@ -8,7 +8,7 @@ function createStockPrice(tickerSymbol: string) {
   } as IStockPrice
 }
 
-export const entitiesToStockPrices = (entities: IEntity[]) => {
+export const getStockPricesFromEntities = (entities: IEntity[]) => {
   return entities.reduce(
     (acc, entity) => {
       if (entity.type === 'Combination') {
@@ -20,8 +20,6 @@ export const entitiesToStockPrices = (entities: IEntity[]) => {
       }
       return acc
     },
-    {} as IStockPriceMap
+    {} as IStockPricesMap
   )
 }
-
-export function tickerSymbolToStockPrice(tickerSymbol: string) {}

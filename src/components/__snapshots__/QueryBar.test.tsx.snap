@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render 1`] = `
+<div
+  className="MuiPaper-root MuiPaper-elevation1 MuiPaper-rounded Hook-root-vy1bts"
+>
+  <div
+    className="MuiInputBase-root Hook-inputBase-m0z6e8"
+    onClick={[Function]}
+  >
+    <input
+      className="MuiInputBase-input Hook-input-10yzuzw"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholder="Start typing your queries ..."
+      type="text"
+    />
+  </div>
+</div>
+`;

@@ -84,8 +84,8 @@ export const Tutorial: React.FC = () => {
                       alignItems="center"
                     >
                       <Grid item>
-                        <Typography variant="h6" color="textSecondary">
-                          {`${steps[activeStep].content}`}
+                        <Typography variant="h6">
+                          {`"${steps[activeStep].content}"`}
                         </Typography>
                         <br />
                       </Grid>
@@ -112,8 +112,8 @@ export const Tutorial: React.FC = () => {
             alignItems="center"
           >
             <Grid item>
-              <Typography variant="h6" color="textSecondary">
-                {`${steps[activeStep].content}`}
+              <Typography variant="h6">
+                {`"${steps[activeStep].content}"`}
               </Typography>
               <br />
             </Grid>

@@ -1,11 +1,11 @@
 import * as constants from './constants'
 import * as quandl from '../services/quandl'
 import { ThunkAction } from 'redux-thunk'
-import { IState, IStockPriceMap } from './reducer'
+import { IState, IStockPricesMap } from './reducer'
 import { IStockPrice } from '../interfaces/StockPrice'
 import { parse } from '../utils/parser'
 import { IEntity } from '../interfaces/Entity'
-import { entitiesToStockPrices } from '../utils/actions'
+import { getStockPricesFromEntities } from '../utils/actions'
 
 interface IUpdateInput {
   type: constants.UPDATE_INPUT
@@ -49,15 +49,15 @@ export const setEntities = (
     entities,
   } as ISetEntities)
 
-  dispatch(updateStockPrices(entitiesToStockPrices(entities)))
+  dispatch(updateStockPrices(getStockPricesFromEntities(entities)))
 }
 
 export interface IUpdateStockPrices {
   type: constants.UPDATE_STOCK_PRICES
-  stockPrices: IStockPriceMap
+  stockPrices: IStockPricesMap
 }
 export const updateStockPrices = (
-  stockPrices: IStockPriceMap
+  stockPrices: IStockPricesMap
 ): ThunkAction<Promise<void>, IState, {}, Action> => async (
   dispatch,
   getState

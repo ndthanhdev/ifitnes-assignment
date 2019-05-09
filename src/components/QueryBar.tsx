@@ -1,8 +1,6 @@
 import React from 'react'
 import { InputBase, Paper } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles'
-import { useDispatch } from 'react-redux'
-import { updateInput } from '../store/actions'
 import _ from 'lodash'
 
 const useStyles = makeStyles({
@@ -22,17 +20,18 @@ const useStyles = makeStyles({
   },
 })
 
-export const QueryBar: React.FC = () => {
+export const QueryBar: React.FC<{
+  onChange?: (value: string) => any
+}> = ({ onChange = () => {} }) => {
   const classes = useStyles()
-  const dispatch = useDispatch()
-  const debouncedDispatch = _.debounce(dispatch, 500)
+  const handleChange = _.debounce(onChange, 500)
 
   return (
     <Paper className={classes.root}>
       <InputBase
         placeholder="Start typing your queries ..."
         className={classes.inputBase}
-        onChange={e => debouncedDispatch(updateInput(e.target.value))}
+        onChange={e => handleChange(e.target.value)}
         inputProps={{ className: classes.input }}
       />
     </Paper>

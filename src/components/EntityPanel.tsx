@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import { IEntity } from '../interfaces/Entity'
-import { Grid, makeStyles, Tabs, Tab } from '@material-ui/core'
+import { Grid, makeStyles, Tabs, Tab, AppBar } from '@material-ui/core'
 import { StockPriceChart } from './StockPriceChart'
 import { SideList } from './SideList'
 import useMediaQuery from '@material-ui/core/useMediaQuery'
 import { useTheme } from '@material-ui/core/styles'
 import moment from 'moment'
+import { useSelector } from 'react-redux'
+import { IState } from '../store/reducer'
 
 function shouldOpenSideList(entity: IEntity) {
   if (entity.type === 'Combination') {
@@ -43,6 +45,10 @@ function getNotBefore(rangeIndex: number) {
       break
   }
   return result
+}
+
+export const useStockPrices = () => {
+  return useSelector((state: IState) => state.stockPriceMap)
 }
 
 const useStyles = makeStyles({
@@ -92,6 +98,8 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
 
   let notBefore = getNotBefore(timeRange)
 
+  const stockPrices = useStockPrices()
+
   return (
     <>
       {isMediumScreen && (
@@ -114,13 +122,18 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
                 timeRange={timeRange}
                 setTimeRange={setTimeRange}
                 notBefore={notBefore}
+                stockPrices={stockPrices}
                 className={classes.chart}
               />
             </Grid>
           </Grid>
           {isOpenSideList && (
             <Grid item container direction="column" md={3} lg={2}>
-              <SideList entity={entity} notBefore={notBefore} />
+              <SideList
+                entity={entity}
+                notBefore={notBefore}
+                stockPrices={stockPrices}
+              />
             </Grid>
           )}
         </Grid>
@@ -130,14 +143,16 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
           <Grid item>
             <div className={classes.tabWrapperParent}>
               <div className={classes.tabWrapper}>
-                <Tabs
-                  value={tabId}
-                  onChange={(event: any, value: any) => setTabId(value)}
-                  centered
-                >
-                  <Tab label="Chart" />
-                  {isOpenSideList && <Tab label="Close Prices" />}
-                </Tabs>
+                <AppBar position="static">
+                  <Tabs
+                    value={tabId}
+                    onChange={(event: any, value: any) => setTabId(value)}
+                    centered
+                  >
+                    <Tab label="Chart" />
+                    {isOpenSideList && <Tab label="Close Prices" />}
+                  </Tabs>
+                </AppBar>
               </div>
             </div>
           </Grid>
@@ -152,11 +167,16 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
                 timeRange={timeRange}
                 setTimeRange={setTimeRange}
                 notBefore={notBefore}
+                stockPrices={stockPrices}
                 className={classes.chart}
               />
             )}
             {isOpenSideList && tabId === 1 && (
-              <SideList entity={entity} notBefore={notBefore} />
+              <SideList
+                entity={entity}
+                notBefore={notBefore}
+                stockPrices={stockPrices}
+              />
             )}
           </Grid>
         </Grid>

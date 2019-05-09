@@ -20,14 +20,14 @@ import {
 import { useSelector } from 'react-redux'
 import _ from 'lodash'
 import randomcolor from 'randomcolor'
-import { IState, IStockPriceMap } from '../store/reducer'
+import { IState, IStockPricesMap } from '../store/reducer'
 import { Moment } from 'moment'
 import { IEntity, ITickerEntity } from '../interfaces/Entity'
 import { IVisualTicker } from '../interfaces/VisualTicker'
 
 function createVisualTicker(
   tickerEntities: ITickerEntity[],
-  stockPrices: IStockPriceMap,
+  stockPrices: IStockPricesMap,
   notBefore: Moment
 ) {
   return tickerEntities.map((tickerEntity, index) => {
@@ -77,10 +77,6 @@ function getErrorMessage(tickers: IVisualTicker[]) {
   return undefined
 }
 
-export const useStockPrices = () => {
-  return useSelector((state: IState) => state.stockPriceMap)
-}
-
 const useStyles = makeStyles({
   flexContainer: {
     display: 'flex',
@@ -110,6 +106,7 @@ interface IProps {
   timeRange: number
   setTimeRange: (timeRange: number) => any
   notBefore: Moment
+  stockPrices: IStockPricesMap;
   className?: string
 }
 
@@ -118,13 +115,12 @@ export const StockPriceChart: React.FC<IProps> = ({
   timeRange,
   setTimeRange,
   notBefore,
+  stockPrices,
   className = '',
 }) => {
   function handleTabChange(event: any, newValue: any) {
     setTimeRange(parseInt(newValue))
   }
-
-  const stockPrices = useStockPrices()
 
   let tickerEntities: ITickerEntity[] = []
 
@@ -209,7 +205,7 @@ export const StockPriceChart: React.FC<IProps> = ({
                         stopOpacity={0.5}
                       />
                       <stop
-                        offset="15%"
+                        offset="20%"
                         stopColor={vTicker.color}
                         stopOpacity={0}
                       />
