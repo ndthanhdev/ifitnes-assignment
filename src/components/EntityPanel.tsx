@@ -94,7 +94,7 @@ export const EntityPanel: React.FC<IProps> = ({ entity }) => {
 
   const [tabId, setTabId] = useState(0)
 
-  const [timeRange, setTimeRange] = React.useState(3)
+  const [timeRange, setTimeRange] = React.useState(0)
 
   let notBefore = getNotBefore(timeRange)
 

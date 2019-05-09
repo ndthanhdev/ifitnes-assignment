@@ -89,13 +89,13 @@ export const Tutorial: React.FC = () => {
                         </Typography>
                         <br />
                       </Grid>
-                      <Grid item>
+                      {/* <Grid item>
                         <img
                           alt={`${steps[activeStep].content}`}
                           src={steps[activeStep].image}
                           className={classes.image}
                         />
-                      </Grid>
+                      </Grid> */}
                     </Grid>
                   </StepContent>
                 )}
@@ -117,13 +117,13 @@ export const Tutorial: React.FC = () => {
               </Typography>
               <br />
             </Grid>
-            <Grid item>
+            {/* <Grid item>
               <img
                 alt={`${steps[activeStep].content}`}
                 src={steps[activeStep].image}
                 className={classes.image}
               />
-            </Grid>
+            </Grid> */}
           </Grid>
         )}
       </Grid>
