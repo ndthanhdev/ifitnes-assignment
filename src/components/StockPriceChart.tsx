@@ -17,10 +17,9 @@ import {
   Grid,
   CircularProgress,
 } from '@material-ui/core'
-import { useSelector } from 'react-redux'
 import _ from 'lodash'
 import randomcolor from 'randomcolor'
-import { IState, IStockPricesMap } from '../store/reducer'
+import { IStockPricesMap } from '../store/reducer'
 import { Moment } from 'moment'
 import { IEntity, ITickerEntity } from '../interfaces/Entity'
 import { IVisualTicker } from '../interfaces/VisualTicker'
@@ -106,7 +105,7 @@ interface IProps {
   timeRange: number
   setTimeRange: (timeRange: number) => any
   notBefore: Moment
-  stockPrices: IStockPricesMap;
+  stockPrices: IStockPricesMap
   className?: string
 }
 

@@ -7,7 +7,7 @@ import { IState } from '../store/reducer'
 import { EntityPanel } from './EntityPanel'
 import { Tutorial } from './Tutorial'
 import CssBaseline from '@material-ui/core/CssBaseline'
-import { updateInput } from '../store/actions';
+import { updateInput } from '../store/actions'
 
 const useEntities = () => {
   return useSelector((state: IState) => state.entities)

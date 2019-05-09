@@ -3,7 +3,6 @@ import * as constants from './constants'
 import { IStockPrice } from '../interfaces/StockPrice'
 import { IEntity } from '../interfaces/Entity'
 
-
 function updateStockPrices(
   newStockPriceMap: IStockPricesMap,
   currentStockPriceMap: IStockPricesMap
@@ -49,7 +48,6 @@ export const initialState: IState = {
   entities: [],
   stockPriceMap: {},
 }
-
 
 export const reducer = (
   state: IState = initialState,
